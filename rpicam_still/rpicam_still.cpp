@@ -24,10 +24,17 @@ using namespace std::chrono_literals;
 using namespace std::placeholders;
 using libcamera::Stream;
 
+// RPiCamStillApp inherits from RPiCamApp
+// RPiCam app == base class
 class RPiCamStillApp : public RPiCamApp
 {
 public:
+	// Constructor that initializes RPiCamApp base class with make_unique_ptr<StillOptions>
+	// Constructor provided explicitly within RPiCamStillApp
 	RPiCamStillApp() : RPiCamApp(std::make_unique<StillOptions>()) {}
+
+	// options.get() used to access the pointer std::unique_ptr<StillOptions> member variable options_
+	// Then uses static_cast to cast the pointer to a StillOptions*
 
 	StillOptions *GetOptions() const { return static_cast<StillOptions *>(options_.get()); }
 };
@@ -61,7 +68,7 @@ static void update_latest_link(std::string const &filename, StillOptions const *
 	// Create a fixed-name link to the most recent output file, if requested.
 	if (!options->latest.empty())
 	{
-		
+
 		struct stat buf;
 		if (stat(options->latest.c_str(), &buf) == 0 && unlink(options->latest.c_str()))
 			LOG_ERROR("WARNING: could not delete latest link " << options->latest);
@@ -163,9 +170,16 @@ static int get_key_or_signal(StillOptions const *options, pollfd p[1])
 
 static void event_loop(RPiCamStillApp &app)
 {
+	// *options has access to app.GetOptions()
 	StillOptions const *options = app.GetOptions();
 	bool output = !options->output.empty() || options->datetime || options->timestamp; // output requested?
-	bool keypress = options->keypress || options->signal; // "signal" mode is much like "keypress" mode
+	bool keypress = options->keypress || options->signal;							   // "signal" mode is much like "keypress" mode
+
+	// Flags can be found at rpicam_app.hpp
+	// Some flags that can be used to give hints to the camera configuration.
+	// |= means conduct bitwise OR operations between two values
+	// still_flags |= RPiCamApp::FLAG_STILL_BGR; same as --> still_flags = still_flags | RPiCamApp::FLAG_STILL_BGR;
+
 	unsigned int still_flags = RPiCamApp::FLAG_STILL_NONE;
 	if (options->encoding == "rgb24" || options->encoding == "png")
 		still_flags |= RPiCamApp::FLAG_STILL_BGR;
@@ -181,7 +195,7 @@ static void event_loop(RPiCamStillApp &app)
 	// Monitoring for keypresses and signals.
 	signal(SIGUSR1, default_signal_handler);
 	signal(SIGUSR2, default_signal_handler);
-	pollfd p[1] = { { STDIN_FILENO, POLLIN, 0 } };
+	pollfd p[1] = {{STDIN_FILENO, POLLIN, 0}};
 
 	if (options->immediate)
 	{
@@ -199,7 +213,7 @@ static void event_loop(RPiCamStillApp &app)
 	else if (options->zsl)
 		app.ConfigureZsl();
 	else
-		app.ConfigureViewfinder();
+		app.ConfigureViewfinder(); // This executes when given args
 	app.StartCamera();
 	auto start_time = std::chrono::high_resolution_clock::now();
 	auto timelapse_time = start_time;
