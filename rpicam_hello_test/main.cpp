@@ -1,12 +1,4 @@
-/* SPDX-License-Identifier: BSD-2-Clause */
-/*
- * Copyright (C) 2020, Raspberry Pi (Trading) Ltd.
- *
- * rpicam_hello.cpp - libcamera "hello world" app.
- */
-
 #include <chrono>
-
 #include "core/rpicam_app.hpp"
 #include "core/options.hpp"
 
@@ -19,7 +11,7 @@ static void event_loop(RPiCamApp &app)
     // app.GetOptions() is a pointer?
     // Options *GetOptions() const { return options_.get(); }
     // Options is a struct that can be found in options.hpp
-    // So I'm guessing that since we're 
+    // So I'm guessing that since we're
     Options const *options = app.GetOptions();
 
     app.OpenCamera();
@@ -47,6 +39,8 @@ static void event_loop(RPiCamApp &app)
         LOG(2, "Viewfinder frame " << count);
         auto now = std::chrono::high_resolution_clock::now();
         // options->timeout.value == 5000 ms
+        // 
+        
         if (options->timeout && (now - start_time) > options->timeout.value)
         {
             std::string timeout_value = std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(options->timeout.value).count());
