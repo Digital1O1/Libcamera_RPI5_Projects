@@ -25,7 +25,7 @@ using namespace std::placeholders;
 using libcamera::Stream;
 
 // RPiCamStillApp inherits from RPiCamApp
-// RPiCam app == base class
+// RPiCamApp == base class
 class RPiCamStillApp : public RPiCamApp
 {
 public:

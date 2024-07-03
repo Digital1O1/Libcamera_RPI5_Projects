@@ -18,6 +18,7 @@ using libcamera::Stream;
 class RPiCamJpegApp : public RPiCamApp
 {
 public:
+	// Example of a member initializer list that calls the constructor of RPiCamApp and initializes it with a unique pointer to the `StillOptions` object
 	RPiCamJpegApp()
 		: RPiCamApp(std::make_unique<StillOptions>())
 	{
